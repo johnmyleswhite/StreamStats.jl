@@ -19,6 +19,7 @@ my_tests = [
     "hyper_log_log.jl",
     "approx_distinct.jl",
     "bootstrap.jl",
+    "sample.jl",
 ]
 
 println("Running tests:")

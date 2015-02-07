@@ -50,6 +50,10 @@ extract the current estimate using the `state` function.
 * StreamStats.Cov
 * StreamStats.Cor
 
+# Available Multivariate Statistics
+
+* StreamStats.Sample
+
 # Bootstrapping
 
 It is also possible to estimate confidence intervals for online statistics

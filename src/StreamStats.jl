@@ -14,4 +14,5 @@ module StreamStats
     include("hyper_log_log.jl")
     include("approx_distinct.jl")
     include("bootstrap.jl")
+    include("sample.jl")
 end
