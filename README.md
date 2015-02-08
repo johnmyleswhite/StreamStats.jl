@@ -43,6 +43,8 @@ extract the current estimate using the `state` function.
 * StreamStats.Var
 * StreamStats.Std
 * StreamStats.Moments
+* StreamStats.Min
+* StreamStats.Max
 * StreamStats.ApproxDistinct
 
 # Available Bivariate Statistics
@@ -53,6 +55,8 @@ extract the current estimate using the `state` function.
 # Available Multivariate Statistics
 
 * StreamStats.Sample
+* StreamStats.ApproxOLS
+* StreamStats.ApproxLogit
 
 # Bootstrapping
 

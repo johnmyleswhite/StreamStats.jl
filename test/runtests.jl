@@ -15,11 +15,15 @@ my_tests = [
     "moments.jl",
     "cov.jl",
     "cor.jl",
+    "min.jl",
+    "max.jl",
     "approx_quantile.jl",
     "hyper_log_log.jl",
     "approx_distinct.jl",
     "bootstrap.jl",
     "sample.jl",
+    "approx_ols.jl",
+    "approx_logit.jl",
 ]
 
 println("Running tests:")
