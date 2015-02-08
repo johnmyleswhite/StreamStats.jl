@@ -24,6 +24,8 @@ my_tests = [
     "sample.jl",
     "approx_ols.jl",
     "approx_logit.jl",
+    "approx_ridge.jl",
+    "approx_l2_logit.jl",
 ]
 
 println("Running tests:")

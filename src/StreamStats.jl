@@ -21,4 +21,6 @@ module StreamStats
     include("sample.jl")
     include("approx_ols.jl")
     include("approx_logit.jl")
+    include("approx_ridge.jl")
+    include("approx_l2_logit.jl")
 end
