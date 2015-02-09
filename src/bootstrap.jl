@@ -1,42 +1,50 @@
 abstract Bootstrap <: StreamStat
 
-type BootstrapBernoulli{S <: ContinuousUnivariateStreamStat} <: Bootstrap
-    replicates::Vector{S}
-    replicate_states::Vector{Float64}
-    α::Float64
-    n::Int
-    # TODO: Force vectors to both have size R
+## Double-or-nothing online bootstrap
+type BernoulliBootstrap{S <: ContinuousUnivariateStreamStat} <: Bootstrap
+    replicates::Vector{S}           # replicates of base stat
+    cached_state::Vector{Float64}  # cache of replicate states
+    n::Int                          # number of observations
+    cache_is_dirty::Bool
 end
 
-function BootstrapBernoulli{S <: ContinuousUnivariateStreamStat}(
+## Poisson weighted online bootstrap
+type PoissonBootstrap{S <: ContinuousUnivariateStreamStat} <: Bootstrap
+    replicates::Vector{S}           # replicates of base stat
+    cached_state::Vector{Float64}  # cache of replicate states
+    n::Int                          # number of observations
+    cache_is_dirty::Bool
+end
+
+# Frozen bootstrap object are generated when two bootstrap distributions
+# are combined, e.g., if they are differenced. 
+immutable FrozenBootstrap <: Bootstrap
+    cached_state::Vector{Float64}  # cache of replicate states
+    n::Int                          # number of observations
+end
+
+# Double or nothing bootstrap
+function BernoulliBootstrap{S <: ContinuousUnivariateStreamStat}(
     stat::S,
     R::Int = 1_000,
     α::Real = 0.05,
 )
     replicates = S[copy(stat) for i in 1:R]
-    replicate_states = Array(Float64, R)
-    return BootstrapBernoulli(replicates, replicate_states, α, 0)
+    cached_state = Array(Float64, R)
+    return BernoulliBootstrap(replicates, cached_state, 0, true)
 end
 
-type BootstrapPoisson{S <: ContinuousUnivariateStreamStat} <: Bootstrap
-    replicates::Vector{S}
-    replicate_states::Vector{Float64}
-    α::Float64
-    n::Int
-    # TODO: Force vectors to both have size R
-end
-
-function BootstrapPoisson{S <: ContinuousUnivariateStreamStat}(
+function PoissonBootstrap{S <: ContinuousUnivariateStreamStat}(
     stat::S,
     R::Int = 1_000,
     α::Float64 = 0.05,
 )
     replicates = S[copy(stat) for i in 1:R]
-    replicate_states = Array(Float64, R)
-    return BootstrapPoisson(replicates, replicate_states, α, 0)
+    cached_state = Array(Float64, R)
+    return PoissonBootstrap(replicates, cached_state, 0, true)
 end
 
-function update!(stat::BootstrapBernoulli, args::Any...)
+function update!(stat::BernoulliBootstrap, args::Any...)
     stat.n += 1
 
     for replicate in stat.replicates
@@ -45,11 +53,11 @@ function update!(stat::BootstrapBernoulli, args::Any...)
             update!(replicate, args...)
         end
     end
-
+    stat.cache_is_dirty = true
     return
 end
 
-function update!(stat::BootstrapPoisson, args::Any...)
+function update!(stat::PoissonBootstrap, args::Any...)
     stat.n += 1
 
     for replicate in stat.replicates
@@ -58,31 +66,77 @@ function update!(stat::BootstrapPoisson, args::Any...)
             update!(replicate, args...)
         end
     end
+    stat.cache_is_dirty = true
 
+    return
+end
+
+function update!(stat::FrozenBootstrap, args::Any...)
+    error("Cannot update a FrozenBootstrap object")
     return
 end
 
 # TODO: Make this work with non-univariate statistics by taking marginal
 #       quantiles
 function state(stat::Bootstrap)
-    R = length(stat.replicates)
+    return stat.replicates
+end
 
-    for (i, replicate) in enumerate(stat.replicates)
-        stat.replicate_states[i] = state(replicate)
+function state(stat::FrozenBootstrap)
+    return stat.cached_state
+end
+
+# update cached_state' states if necessary and return their values
+function cached_state(stat::Bootstrap)
+    if stat.cache_is_dirty
+        for (i, replicate) in enumerate(stat.replicates)
+            stat.cached_state[i] = state(replicate)
+        end
+        stat.cache_is_dirty = false
     end
+    return stat.cached_state
+end
+
+function cached_state(stat::FrozenBootstrap)
+    return stat.cached_state
+end
+
+function ci(stat::Bootstrap, α=0.05, method=:quantile)
+    states = cached_state(stat)
 
     # If any NaN, return NaN, NaN
-    if any(isnan, stat.replicate_states)
+    if any(isnan, states)
         return (NaN, NaN)
     else
-        return (
-            quantile(stat.replicate_states, stat.α / 2),
-            quantile(stat.replicate_states, 1 - stat.α / 2),
-        )
+        if method == :quantile
+            return (
+                quantile(states, α / 2),
+                quantile(states, 1 - α / 2),
+            )
+        elseif method == :normal
+            norm_approx = Distributions.Normal(
+                mean(states),
+                std(states)
+            )
+            return (
+                quantile(norm_approx, α / 2),
+                quantile(norm_approx, 1 - α / 2)
+            )
+        else
+            error("Unrecognized confidence interval type: ", ci)
+        end
     end
 end
 
 nobs(stat::Bootstrap) = stat.n
+
+# Assumes a and b are independent.
+function Base.(:-)(a::Bootstrap, b::Bootstrap)
+    return FrozenBootstrap(
+        cached_state(a) - cached_state(b),
+        nobs(a) + nobs(b)
+    )
+end
 
 # Base.copy(stat::Bootstrap)
 
@@ -90,10 +144,14 @@ nobs(stat::Bootstrap) = stat.n
 
 # function Base.empty!(stat::Bootstrap)
 
+function Base.rand(stat::Bootstrap)
+    cs = cached_state(stat)
+    cs[rand(1:length(cs))]
+end
+
 function Base.show(io::IO, stat::Bootstrap)
     @printf("%s:\n", typeof(stat))
-    @printf(" * Replicates: %d\n", length(stat.replicates))
-    @printf(" * Confidence Level: %f\n", 1 - stat.α)
-    lower, upper = state(stat)
+    @printf(" * Replicates: %d\n", length(stat.cached_state))
+    lower, upper = ci(stat, 0.05)
     @printf(" * Confidence Interval: [%f, %f]", lower, upper)
 end
