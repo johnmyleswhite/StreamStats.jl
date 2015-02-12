@@ -11,7 +11,9 @@ function update!(stat::Max, x::Real)
     return
 end
 
-state(stat::Max) = stat.m
+Base.maximum(stat::Max) = stat.m
+
+state(stat::Max) = Base.maximum(stat)
 
 nobs(stat::Max) = stat.n
 
@@ -30,7 +32,7 @@ function Base.empty!(stat::Max)
 end
 
 function Base.show(io::IO, stat::Max)
-    m = state(stat)
+    m = maximum(stat)
     n = nobs(stat)
     @printf(io, "Online Max\n")
     @printf(io, " * Max:  %f\n", m)

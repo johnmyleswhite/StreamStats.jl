@@ -1,15 +1,13 @@
 module StreamStats
     import StatsBase, Distributions
 
-    export update!, state, nobs, rand, ci
+    export update!, state, nobs, replicates
 
     include("streamstat.jl")
     include("mean.jl")
     include("var.jl")
-    include("std.jl")
     include("moments.jl")
     include("cov.jl")
-    include("cor.jl")
     include("min.jl")
     include("max.jl")
     # include("approx_quantile.jl")

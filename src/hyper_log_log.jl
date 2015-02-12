@@ -1,4 +1,8 @@
-hash32(d::Any) = uint32(hash(d))
+if VERSION < v"0.4.0-"
+    hash32(d::Any) = uint32(hash(d))
+else
+    hash32(d::Any) = hash(d) % Uint32
+end
 
 ρ(s::Uint32) = uint32(uint32(leading_zeros(s)) + 0x00000001)
 
@@ -64,7 +68,7 @@ function state(counter::HyperLogLog)
 
     Z = 1 / S
 
-    E = α(counter.m) * counter.m^2 * Z
+    E = α(counter.m) * uint(counter.m)^2 * Z
 
     if E <= 5//2 * counter.m
         V = 0
