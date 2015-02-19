@@ -6,7 +6,7 @@ module TestSample
     k = 3
     xs = rand(1:100_000, n)
     @assert length(unique(xs)) == n
-    counts = Dict(unique(xs), fill(0, n))
+    counts = Dict(zip(unique(xs), fill(0, n)))
 
     for itr in 1:100_000
         stat = StreamStats.Sample(Int, k)
