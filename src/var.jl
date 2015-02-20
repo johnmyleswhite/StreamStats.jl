@@ -1,13 +1,13 @@
-type Var <: ContinuousUnivariateStreamStat
+type Variance <: ContinuousUnivariateStreamStat
     m::Float64
     sum_sqs::Float64
     v_hat::Float64
     n::Int
 end
 
-Var() = Var(0.0, 0.0, NaN, 0)
+Variance() = Variance(0.0, 0.0, NaN, 0)
 
-function update!(stat::Var, x::Real)
+function update!(stat::Variance, x::Real)
     stat.n += 1
 
     if stat.n == 1
@@ -24,23 +24,29 @@ function update!(stat::Var, x::Real)
     return
 end
 
-state(stat::Var) = stat.v_hat
+Base.var(stat::Variance) = stat.v_hat
 
-nobs(stat::Var) = stat.n
+Base.std(stat::Variance) = sqrt(var(stat))
 
-function Base.copy(stat::Var)
-    return Var(stat.m, stat.sum_sqs, stat.v_hat, stat.n)
+Base.mean(stat::Variance) = stat.m
+
+state(stat::Variance) = var(stat)
+
+nobs(stat::Variance) = stat.n
+
+function Base.copy(stat::Variance)
+    return Variance(stat.m, stat.sum_sqs, stat.v_hat, stat.n)
 end
 
-function Base.merge(a::Var, b::Var)
+function Base.merge(a::Variance, b::Variance)
     n = a.n + b.n
     m = (a.n / n) * a.m + (b.n / n) * b.m
     sum_sqs = a.sum_sqs + b.sum_sqs
     v_hat = (a.n / n) * a.v_hat + (b.n / n) * b.v_hat
-    return Var(m, sum_sqs, v_hat, n)
+    return Variance(m, sum_sqs, v_hat, n)
 end
 
-function Base.empty!(stat::Var)
+function Base.empty!(stat::Variance)
     stat.m = 0.0
     stat.sum_sqs = 0.0
     stat.v_hat = NaN
@@ -48,13 +54,13 @@ function Base.empty!(stat::Var)
     return
 end
 
-function Base.show(io::IO, stat::Var)
-    v = state(stat)
+function Base.show(io::IO, stat::Variance)
+    v = var(stat)
+    s = std(stat)
     n = nobs(stat)
     @printf(io, "Online Variance\n")
-    @printf(io, " * Variance: %f\n", v)
-    @printf(io, " * N:        %d\n", n)
+    @printf(io, " * Variance:  %f\n", v)
+    @printf(io, " * Std. Dev.: %f\n", v)
+    @printf(io, " * N:         %d\n", n)
     return
 end
-
-Base.mean(stat::Var) = stat.m

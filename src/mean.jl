@@ -12,7 +12,9 @@ function update!(stat::Mean, x::Real)
     return
 end
 
-state(stat::Mean) = stat.m
+Base.mean(stat::Mean) = stat.m
+
+state(stat::Mean) = Base.mean(stat)
 
 nobs(stat::Mean) = stat.n
 
@@ -33,7 +35,7 @@ function Base.empty!(stat::Mean)
 end
 
 function Base.show(io::IO, stat::Mean)
-    m = state(stat)
+    m = mean(stat)
     n = nobs(stat)
     @printf(io, "Online Mean\n")
     @printf(io, " * Mean: %f\n", m)

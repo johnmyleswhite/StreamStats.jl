@@ -10,7 +10,8 @@ module TestMin
         for x in xs
             update!(stat, x)
         end
-        online_m = state(stat)
+        online_m = minimum(stat)
+        online_s = state(stat)
         online_n = nobs(stat)
         batch_m = minimum(xs)
         @test online_m == batch_m

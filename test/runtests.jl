@@ -11,10 +11,8 @@ using Base.Test
 my_tests = [
     "mean.jl",
     "var.jl",
-    "std.jl",
     "moments.jl",
     "cov.jl",
-    "cor.jl",
     "min.jl",
     "max.jl",
     "approx_quantile.jl",

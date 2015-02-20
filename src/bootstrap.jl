@@ -2,9 +2,9 @@ abstract Bootstrap <: StreamStat
 
 ## Double-or-nothing online bootstrap
 type BernoulliBootstrap{S <: ContinuousUnivariateStreamStat} <: Bootstrap
-    replicates::Vector{S}           # replicates of base stat
-    cached_state::Vector{Float64}  # cache of replicate states
-    n::Int                          # number of observations
+    replicates::Vector{S}            # replicates of base stat
+    cached_state::Vector{Float64}    # cache of replicate states
+    n::Int                           # number of observations
     cache_is_dirty::Bool
 end
 
@@ -17,7 +17,7 @@ type PoissonBootstrap{S <: ContinuousUnivariateStreamStat} <: Bootstrap
 end
 
 # Frozen bootstrap object are generated when two bootstrap distributions
-# are combined, e.g., if they are differenced. 
+# are combined, e.g., if they are differenced.
 immutable FrozenBootstrap <: Bootstrap
     cached_state::Vector{Float64}  # cache of replicate states
     n::Int                          # number of observations
@@ -54,6 +54,7 @@ function update!(stat::BernoulliBootstrap, args::Any...)
         end
     end
     stat.cache_is_dirty = true
+
     return
 end
 
@@ -78,13 +79,23 @@ end
 
 # TODO: Make this work with non-univariate statistics by taking marginal
 #       quantiles
-function state(stat::Bootstrap)
+function replicates(stat::Bootstrap)
     return stat.replicates
 end
 
-function state(stat::FrozenBootstrap)
+function replicates(stat::FrozenBootstrap)
     return stat.cached_state
 end
+
+function Base.mean(stat::Bootstrap)
+  return mean(cached_state(stat))
+end
+
+function Base.std(stat::Bootstrap)
+  return std(cached_state(stat))
+end
+
+state(stat::Bootstrap) = stat.replicates
 
 # update cached_state' states if necessary and return their values
 function cached_state(stat::Bootstrap)
@@ -152,6 +163,7 @@ end
 function Base.show(io::IO, stat::Bootstrap)
     @printf("%s:\n", typeof(stat))
     @printf(" * Replicates: %d\n", length(stat.cached_state))
+    @printf(" * Observations: %d\n", stat.n)
     lower, upper = ci(stat, 0.05)
     @printf(" * Confidence Interval: [%f, %f]", lower, upper)
 end

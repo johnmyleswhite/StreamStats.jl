@@ -1,13 +1,13 @@
-type Cov <: ContinuousUnivariateStreamStat
-    x::Std
-    y::Std
+type Covariance <: ContinuousUnivariateStreamStat
+    x::Variance
+    y::Variance
     sum_sqs::Float64
     n::Int
 end
 
-Cov() = Cov(Std(), Std(), 0.0, 0)
+Covariance() = Covariance(Variance(), Variance(), 0.0, 0)
 
-function update!(stat::Cov, x::Real, y::Real)
+function update!(stat::Covariance, x::Real, y::Real)
     m_x = mean(stat.x)
     m_y = mean(stat.y)
 
@@ -20,14 +20,17 @@ function update!(stat::Cov, x::Real, y::Real)
     return
 end
 
-nobs(stat::Cov) = stat.n
+nobs(stat::Covariance) = stat.n
 
-state(stat::Cov) = stat.sum_sqs / (stat.n - 1)
+Base.cov(stat::Covariance) = stat.sum_sqs / (stat.n - 1)
+Base.cor(stat::Covariance) = cov(stat) / (std(stat.x) * std(stat.y))
 
-Base.copy(stat::Cov) = Cov(copy(stat.x), copy(stat.y), stat.sum_sqs, stat.n)
+state(stat::Covariance) = Base.cov(stat)
 
-function Base.merge(a::Cov, b::Cov)
-    merged = Cov()
+Base.copy(stat::Covariance) = Covariance(copy(stat.x), copy(stat.y), stat.sum_sqs, stat.n)
+
+function Base.merge(a::Covariance, b::Covariance)
+    merged = Covariance()
 
     merged.x = merge(a.x, b.x)
     merged.y = merge(a.y, b.y)
@@ -41,7 +44,7 @@ function Base.merge(a::Cov, b::Cov)
     return merged
 end
 
-function Base.empty!(stat::Cov)
+function Base.empty!(stat::Covariance)
     empty!(stat.x)
     empty!(stat.y)
     stat.sum_sqs = 0.0
@@ -49,11 +52,13 @@ function Base.empty!(stat::Cov)
     return
 end
 
-function Base.show(io::IO, stat::Cov)
-    cov = state(stat)
+function Base.show(io::IO, stat::Covariance)
+    cov = cov(stat)
+    cor = cor(stat)
     n = nobs(stat)
     @printf(io, "Online Covariance\n")
     @printf(io, " * Covariance: %f\n", cov)
+    @printf(io, " * Correlation: %f\n", cor)
     @printf(io, " * N:          %d\n", n)
     return
 end
