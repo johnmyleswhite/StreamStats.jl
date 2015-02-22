@@ -5,6 +5,7 @@ module StreamStats
 
     include("streamstat.jl")
     include("mean.jl")
+    include("imm_mean.jl")
     include("var.jl")
     include("moments.jl")
     include("cov.jl")
