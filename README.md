@@ -84,7 +84,7 @@ state(stat), state(ci1), state(ci2)
 
 Given any other statistic object, you can use the `BootstrapBernoulli` or
 `BootstrapPoisson` types to estimate a confidence interval. These types require
-that you specify the number of bootstrap repliates (i.e. `1_000`) and the error
+that you specify the number of bootstrap replicates (i.e. `1_000`) and the error
 rate for nominal coverage of the confidence interval (i.e. `0.05`).
 
 # Thanks
