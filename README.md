@@ -31,17 +31,17 @@ for (x, y) in zip(xs, ys)
     @printf("Estimated covariance: %f\n", state(cov_xy))
 end
 
-state(var_x), state(var_y), state(cov_xy)
+state(var_x), var(var_x), std(var_x)
+state(cov_xy), cov(cov_xy), cor(cov_xy)
 ```
 
 As you can see, you update statistics using the `update!` function and
-extract the current estimate using the `state` function.
+extract the current estimate using the `state` function, or 
 
 # Available Statistics
 
 * StreamStats.Mean
 * StreamStats.Var
-* StreamStats.Std
 * StreamStats.Moments
 * StreamStats.Min
 * StreamStats.Max
@@ -50,7 +50,6 @@ extract the current estimate using the `state` function.
 # Available Bivariate Statistics
 
 * StreamStats.Cov
-* StreamStats.Cor
 
 # Available Multivariate Statistics
 
@@ -66,7 +65,7 @@ using online bootstrap methods:
 ```jl
 using StreamStats
 
-stat = StreamStats.Cor()
+stat = StreamStats.Cov()
 ci1 = StreamStats.BootstrapBernoulli(stat, 1_000, 0.05)
 ci2 = StreamStats.BootstrapPoisson(stat, 1_000, 0.05)
 
