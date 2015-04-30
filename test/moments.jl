@@ -17,7 +17,7 @@ module TestMoments
         online_v = var(xs)
         online_s = skewness(xs)
         online_k = kurtosis(xs)
-        online_n = nobs(stat)
+        online_n = StreamStats.nobs(stat)
         batch_m = mean(xs)
         batch_v = var(xs)
         batch_s = skewness(xs)
