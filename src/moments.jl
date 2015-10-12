@@ -105,6 +105,8 @@ Base.var(stat::Moments) = stat.m2 / (stat.n - 1)
 
 Base.std(stat::Moments) = sqrt(var(stat))
 
+StatsBase.sem(stat::Moments) = sqrt(var(stat) / stat.n)
+
 StatsBase.skewness(stat::Moments) = sqrt(stat.n) * stat.m3 / stat.m2^1.5
 
 StatsBase.kurtosis(stat::Moments) = stat.n * stat.m4 / (stat.m2 * stat.m2) - 3.0
