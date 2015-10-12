@@ -35,7 +35,7 @@ end
 
 StatsBase.sample{T}(stat::Sample{T}) = state(stat)
 
-nobs(stat::Sample) = stat.n
+StatsBase.nobs(stat::Sample) = stat.n
 
 Base.copy(stat::Sample) = Sample(stat.sample, stat.n)
 

@@ -48,7 +48,7 @@ end
 
 state(stat::ApproxRidge) = vcat(stat.β₀, stat.β)
 
-nobs(stat::ApproxRidge) = stat.n
+StatsBase.nobs(stat::ApproxRidge) = stat.n
 
 function Base.show(io::IO, stat::ApproxRidge)
     p = length(state(stat))

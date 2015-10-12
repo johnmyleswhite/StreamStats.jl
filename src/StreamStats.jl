@@ -1,7 +1,7 @@
 module StreamStats
     import StatsBase, Distributions
 
-    export update!, state, nobs, replicates
+    export update!, state, replicates
 
     include("streamstat.jl")
     include("mean.jl")

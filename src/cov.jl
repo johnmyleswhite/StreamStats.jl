@@ -20,7 +20,7 @@ function update!(stat::Covariance, x::Real, y::Real)
     return
 end
 
-nobs(stat::Covariance) = stat.n
+StatsBase.nobs(stat::Covariance) = stat.n
 
 Base.cov(stat::Covariance) = stat.sum_sqs / (stat.n - 1)
 Base.cor(stat::Covariance) = cov(stat) / (std(stat.x) * std(stat.y))

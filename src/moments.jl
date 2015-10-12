@@ -43,7 +43,7 @@ function StatsBase.kurtosis(stat::Moments)
     return stat.n * stat.m4 / (stat.m2 * stat.m2) - 3.0
 end
 
-nobs(stat::Moments) = stat.n
+StatsBase.nobs(stat::Moments) = stat.n
 
 function state(stat::Moments)
     return (mean(stat), var(stat), StatsBase.skewness(stat), StatsBase.kurtosis(stat))
@@ -104,6 +104,8 @@ Base.mean(stat::Moments) = stat.m1
 Base.var(stat::Moments) = stat.m2 / (stat.n - 1)
 
 Base.std(stat::Moments) = sqrt(var(stat))
+
+StatsBase.sem(stat::Moments) = sqrt(var(stat) / stat.n)
 
 StatsBase.skewness(stat::Moments) = sqrt(stat.n) * stat.m3 / stat.m2^1.5
 

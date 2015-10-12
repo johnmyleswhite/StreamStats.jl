@@ -32,7 +32,7 @@ Base.mean(stat::Variance) = stat.m
 
 state(stat::Variance) = var(stat)
 
-nobs(stat::Variance) = stat.n
+StatsBase.nobs(stat::Variance) = stat.n
 
 function Base.copy(stat::Variance)
     return Variance(stat.m, stat.sum_sqs, stat.v_hat, stat.n)

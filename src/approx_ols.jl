@@ -39,7 +39,7 @@ end
 
 state(stat::ApproxOLS) = vcat(stat.β₀, stat.β)
 
-nobs(stat::ApproxOLS) = stat.n
+StatsBase.nobs(stat::ApproxOLS) = stat.n
 
 function Base.show(io::IO, stat::ApproxOLS)
     p = length(state(stat))
