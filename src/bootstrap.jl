@@ -139,7 +139,7 @@ function ci(stat::Bootstrap, α=0.05, method=:quantile)
     end
 end
 
-nobs(stat::Bootstrap) = stat.n
+StatsBase.nobs(stat::Bootstrap) = stat.n
 
 # Assumes a and b are independent.
 function Base.(:-)(a::Bootstrap, b::Bootstrap)

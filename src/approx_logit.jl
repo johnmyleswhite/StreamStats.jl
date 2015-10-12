@@ -41,7 +41,7 @@ end
 
 state(stat::ApproxLogit) = vcat(stat.β₀, stat.β)
 
-nobs(stat::ApproxLogit) = stat.n
+StatsBase.nobs(stat::ApproxLogit) = stat.n
 
 function Base.show(io::IO, stat::ApproxLogit)
     p = length(state(stat))

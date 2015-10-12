@@ -15,7 +15,7 @@ end
 
 state(stat::ApproxDistinct) = state(stat.counter)
 
-nobs(stat::ApproxDistinct) = stat.n
+StatsBase.nobs(stat::ApproxDistinct) = stat.n
 
 Base.copy(stat::ApproxDistinct) = ApproxDistinct(copy(stat.counter), 0)
 

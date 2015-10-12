@@ -43,7 +43,7 @@ function StatsBase.kurtosis(stat::Moments)
     return stat.n * stat.m4 / (stat.m2 * stat.m2) - 3.0
 end
 
-nobs(stat::Moments) = stat.n
+StatsBase.nobs(stat::Moments) = stat.n
 
 function state(stat::Moments)
     return (mean(stat), var(stat), StatsBase.skewness(stat), StatsBase.kurtosis(stat))
