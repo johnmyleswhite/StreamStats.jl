@@ -8,20 +8,25 @@ module TestMoments
     # Moments of uniform draws
     for n in rand(1:1_000_000, 100)
         xs = rand(n)
-        stat = StreamStats.Moments()
-        for x in xs
-            update!(stat, x)
-        end
-        online_ms, online_vs, online_ss, online_ks = state(stat)
-        online_m = mean(xs)
-        online_v = var(xs)
-        online_s = skewness(xs)
-        online_k = kurtosis(xs)
-        online_n = nobs(stat)
         batch_m = mean(xs)
         batch_v = var(xs)
         batch_s = skewness(xs)
         batch_k = kurtosis(xs)
+
+        stats = zeros(StreamStats.Moments, 100)
+        for j = 1:length(stats)
+          for i = j:length(stats):length(xs)
+            stats[j] += xs[i]
+          end
+        end
+
+        stat = sum(stats)
+        online_ms, online_vs, online_ss, online_ks = state(stat)
+        online_m = mean(stat)
+        online_v = var(stat)
+        online_s = skewness(stat)
+        online_k = kurtosis(stat)
+        online_n = nobs(stat)
 
         @test_approx_eq(online_m, batch_m)
         @test_approx_eq(online_ms, batch_m)
