@@ -12,8 +12,8 @@ end
 
 function ApproxRidge(p::Integer, λ::Real, α::Real = 0.1)
     return ApproxRidge(
-        float64(λ),
-        float64(α),
+        convert(Float64, λ),
+        convert(Float64, α),
         0.0,
         fill(0.0, p),
         0.0,
@@ -48,7 +48,7 @@ end
 
 state(stat::ApproxRidge) = vcat(stat.β₀, stat.β)
 
-nobs(stat::ApproxRidge) = stat.n
+StatsBase.nobs(stat::ApproxRidge) = stat.n
 
 function Base.show(io::IO, stat::ApproxRidge)
     p = length(state(stat))

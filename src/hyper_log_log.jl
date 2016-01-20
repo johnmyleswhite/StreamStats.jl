@@ -1,28 +1,28 @@
 if VERSION < v"0.4.0-"
     hash32(d::Any) = uint32(hash(d))
 else
-    hash32(d::Any) = hash(d) % Uint32
+    hash32(d::Any) = hash(d) % UInt32
 end
 
-ρ(s::Uint32) = uint32(uint32(leading_zeros(s)) + 0x00000001)
+ρ(s::UInt32) = UInt32(UInt32(leading_zeros(s)) + 0x00000001)
 
-function α(m::Uint32)
+function α(m::UInt32)
     if m == 0x00000010
         return 0.673
     elseif m == 0x00000020
         return 0.697
     elseif m == 0x00000040
         return 0.709
-    else # if m >= uint32(128)
+    else # if m >= UInt32(128)
         return 0.7213 / (1 + 1.079 / m)
     end
 end
 
 type HyperLogLog
-    m::Uint32
-    M::Vector{Uint32}
-    mask::Uint32
-    altmask::Uint32
+    m::UInt32
+    M::Vector{UInt32}
+    mask::UInt32
+    altmask::UInt32
 end
 
 function HyperLogLog(b::Integer)
@@ -32,7 +32,7 @@ function HyperLogLog(b::Integer)
 
     m = 0x00000001 << b
 
-    M = zeros(Uint32, m)
+    M = zeros(UInt32, m)
 
     mask = 0x00000000
     for i in 1:(b - 1)
@@ -47,13 +47,13 @@ function HyperLogLog(b::Integer)
 end
 
 function Base.show(io::IO, counter::HyperLogLog)
-    @printf(io, "A HyperLogLog counter w/ %d registers", int(counter.m))
+    @printf(io, "A HyperLogLog counter w/ %d registers", convert(Int, counter.m))
     return
 end
 
 function update!(counter::HyperLogLog, v::Any)
     x = hash32(v)
-    j = uint32((x & counter.mask) + 0x00000001)
+    j = UInt32((x & counter.mask) + 0x00000001)
     w = x & counter.altmask
     counter.M[j] = max(counter.M[j], ρ(w))
     return
@@ -68,12 +68,12 @@ function state(counter::HyperLogLog)
 
     Z = 1 / S
 
-    E = α(counter.m) * uint(counter.m)^2 * Z
+    E = α(counter.m) * convert(UInt, counter.m)^2 * Z
 
     if E <= 5//2 * counter.m
         V = 0
         for j in 1:counter.m
-            V += int(counter.M[j] == 0x00000000)
+            V += convert(Int, (counter.M[j] == 0x00000000))
         end
         if V != 0
             E_star = counter.m * log(counter.m / V)

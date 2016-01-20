@@ -1,6 +1,10 @@
+# VERSION >= v"0.4.0-dev+6521" && __precompile__()
+
 module StreamStats
+    using Compat
     import StatsBase, Distributions
 
+    import StatsBase: nobs
     export update!, state, nobs, replicates
 
     include("streamstat.jl")

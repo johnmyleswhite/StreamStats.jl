@@ -14,8 +14,8 @@ end
 
 function ApproxL2Logit(p::Integer, λ::Real, α::Real = 0.1)
     return ApproxL2Logit(
-        float64(λ),
-        float64(α),
+        convert(Float64, λ),
+        convert(Float64, α),
         0.0,
         fill(0.0, p),
         0.0,
@@ -50,7 +50,7 @@ end
 
 state(stat::ApproxL2Logit) = vcat(stat.β₀, stat.β)
 
-nobs(stat::ApproxL2Logit) = stat.n
+StatsBase.nobs(stat::ApproxL2Logit) = stat.n
 
 function Base.show(io::IO, stat::ApproxL2Logit)
     p = length(state(stat))

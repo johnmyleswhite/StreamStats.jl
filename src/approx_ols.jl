@@ -10,7 +10,7 @@ type ApproxOLS <: StreamStat
 end
 
 function ApproxOLS(p::Integer, α::Real = 0.1)
-    return ApproxOLS(float64(α), 0.0, fill(0.0, p), 0.0, fill(0.0, p), 0)
+    return ApproxOLS(convert(Float64, α), 0.0, fill(0.0, p), 0.0, fill(0.0, p), 0)
 end
 
 function update!(stat::ApproxOLS, x::Vector{Float64}, y::Real)
@@ -39,7 +39,7 @@ end
 
 state(stat::ApproxOLS) = vcat(stat.β₀, stat.β)
 
-nobs(stat::ApproxOLS) = stat.n
+StatsBase.nobs(stat::ApproxOLS) = stat.n
 
 function Base.show(io::IO, stat::ApproxOLS)
     p = length(state(stat))

@@ -12,7 +12,7 @@ type ApproxLogit <: StreamStat
 end
 
 function ApproxLogit(p::Integer, α::Real = 0.1)
-    return ApproxLogit(float64(α), 0.0, fill(0.0, p), 0.0, fill(0.0, p), 0)
+    return ApproxLogit(convert(Float64, α), 0.0, fill(0.0, p), 0.0, fill(0.0, p), 0)
 end
 
 function update!(stat::ApproxLogit, x::Vector{Float64}, y::Real)
@@ -41,7 +41,7 @@ end
 
 state(stat::ApproxLogit) = vcat(stat.β₀, stat.β)
 
-nobs(stat::ApproxLogit) = stat.n
+StatsBase.nobs(stat::ApproxLogit) = stat.n
 
 function Base.show(io::IO, stat::ApproxLogit)
     p = length(state(stat))
