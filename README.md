@@ -1,3 +1,6 @@
+**Notice**: StreamStats.jl has been deprecated in favor of [OnlineStats.jl](https://github.com/joshday/OnlineStats.jl).  OnlineStats has a superset of the features available in StreamStats and development is active.
+
+
 StreamStats.jl
 ==============
 
