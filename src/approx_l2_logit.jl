@@ -1,4 +1,9 @@
 # AdaGrad + Analytic Gradient
+if VERSION < v"0.4.0-"
+    const tofloat64 = float64
+else
+    const tofloat64 = Float64
+end
 
 invlogit(z::Real) = 1 / (1 + exp(-z))
 
@@ -14,8 +19,8 @@ end
 
 function ApproxL2Logit(p::Integer, λ::Real, α::Real = 0.1)
     return ApproxL2Logit(
-        float64(λ),
-        float64(α),
+        tofloat64(λ),
+        tofloat64(α),
         0.0,
         fill(0.0, p),
         0.0,

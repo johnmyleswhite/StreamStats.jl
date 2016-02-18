@@ -1,4 +1,9 @@
 # AdaGrad + Analytic Gradient
+if VERSION < v"0.4.0-"
+    const tofloat64 = float64
+else
+    const tofloat64 = Float64
+end
 
 type ApproxRidge <: StreamStat
     λ::Float64
@@ -12,8 +17,8 @@ end
 
 function ApproxRidge(p::Integer, λ::Real, α::Real = 0.1)
     return ApproxRidge(
-        float64(λ),
-        float64(α),
+        tofloat64(λ),
+        tofloat64(α),
         0.0,
         fill(0.0, p),
         0.0,

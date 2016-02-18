@@ -1,10 +1,17 @@
 if VERSION < v"0.4.0-"
     hash32(d::Any) = uint32(hash(d))
+    maskadd32(x::Uint32, mask::Uint32, add::Uint32) = uint32((x & mask) + add)
+    ρ(s::Uint32) = uint32(uint32(leading_zeros(s)) + 0x00000001)
+    const toint = int
+    const touint = uint
 else
     hash32(d::Any) = hash(d) % Uint32
+    maskadd32(x::UInt32, mask::UInt32, add::UInt32) = (x & mask) + add 
+    ρ(s::UInt32) = UInt32(leading_zeros(s)) + 0x00000001
+    const toint = Int
+    const touint = UInt
 end
 
-ρ(s::Uint32) = uint32(uint32(leading_zeros(s)) + 0x00000001)
 
 function α(m::Uint32)
     if m == 0x00000010
@@ -53,7 +60,7 @@ end
 
 function update!(counter::HyperLogLog, v::Any)
     x = hash32(v)
-    j = uint32((x & counter.mask) + 0x00000001)
+    j = maskadd32(x, counter.mask, 0x00000001)
     w = x & counter.altmask
     counter.M[j] = max(counter.M[j], ρ(w))
     return
@@ -68,12 +75,12 @@ function state(counter::HyperLogLog)
 
     Z = 1 / S
 
-    E = α(counter.m) * uint(counter.m)^2 * Z
+    E = α(counter.m) * touint(counter.m)^2 * Z
 
     if E <= 5//2 * counter.m
         V = 0
         for j in 1:counter.m
-            V += int(counter.M[j] == 0x00000000)
+            V += toint(counter.M[j] == 0x00000000)
         end
         if V != 0
             E_star = counter.m * log(counter.m / V)

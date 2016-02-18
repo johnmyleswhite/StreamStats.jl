@@ -1,4 +1,11 @@
 # AdaGrad + Analytic Gradient
+if VERSION < v"0.4.0-"
+    const tofloat64 = float64
+else
+    const tofloat64 = Float64
+end
+
+
 
 type ApproxOLS <: StreamStat
     α::Float64
@@ -10,7 +17,7 @@ type ApproxOLS <: StreamStat
 end
 
 function ApproxOLS(p::Integer, α::Real = 0.1)
-    return ApproxOLS(float64(α), 0.0, fill(0.0, p), 0.0, fill(0.0, p), 0)
+    return ApproxOLS(tofloat64(α), 0.0, fill(0.0, p), 0.0, fill(0.0, p), 0)
 end
 
 function update!(stat::ApproxOLS, x::Vector{Float64}, y::Real)
